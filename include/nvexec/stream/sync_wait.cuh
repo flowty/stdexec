@@ -119,11 +119,8 @@ namespace nvexec::STDEXEC_STREAM_DETAIL_NS { namespace sync_wait {
     using receiver_t = stdexec::__t<receiver_t<stdexec::__id<Sender>>>;
 
     template <stdexec::__single_value_variant_sender<__env> Sender>
-      requires(!stdexec::__tag_invocable_with_completion_scheduler<
-                sync_wait_t,
-                stdexec::set_value_t,
-                Sender>)
-           && (!stdexec::tag_invocable<sync_wait_t, Sender>) && stdexec::sender_in<Sender, __env>
+      requires(!stdexec::__tag_invocable_with_domain< sync_wait_t, stdexec::set_value_t, Sender>)
+           && (!stdexec::tag_invocable<sync_wait_t, Sender>) && stdexec::sender<Sender, __env>
            && stdexec::__receiver_from<receiver_t<Sender>, Sender>
     auto operator()(context_state_t context_state, Sender&& __sndr) const
       -> std::optional<sync_wait_result_t<Sender>> {
