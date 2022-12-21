@@ -192,6 +192,14 @@ struct error_scheduler {
   using __id = error_scheduler;
   using __t = error_scheduler;
 
+  error_scheduler() = default;
+
+  explicit error_scheduler(E err)
+    : err_((E&&) err) {
+  }
+
+  error_scheduler(const error_scheduler&) noexcept = default;
+ private:
   template <typename R>
   struct oper : immovable {
     R recv_;

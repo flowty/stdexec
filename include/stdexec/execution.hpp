@@ -731,24 +731,23 @@ namespace stdexec {
   /////////////////////////////////////////////////////////////////////////////
   // [execution.sender_transform]
   namespace __sndr_tfx {
-    struct sender_transform_t;
-
-    template <class _Value, class _Env>
-    concept __with_tag_invoke = tag_invocable<sender_transform_t, _Value, _Env>;
-
     struct sender_transform_t {
       template <class _Value, class _Env = no_env>
-      constexpr decltype(auto) operator()(_Value&& __val, const _Env& __env = {}) const noexcept(
-        !tag_invocable<sender_transform_t, _Value, _Env>
-        || nothrow_tag_invocable<sender_transform_t, _Value, _Env>) {
+        requires tag_invocable<sender_transform_t, __env_domain_t<_Env, _Value>, _Value, const _Env&>
+      constexpr auto operator()(_Value __val, const _Env& __env = {}) const noexcept(
+        nothrow_tag_invocable<sender_transform_t, __env_domain_t<_Env, _Value>, _Value, const _Env&>)
+        -> tag_invoke_result_t<sender_transform_t, __env_domain_t<_Env, _Value>, _Value, const _Env&> {
         static_assert(sizeof(_Value), "Incomplete type used with sender_transform");
         static_assert(sizeof(_Env), "Incomplete type used with sender_transform");
+        using _Domain = __env_domain_t<_Env, _Value>;
+        return tag_invoke(*this, _Domain{}, (_Value&&) __val, __env);
+      }
 
-        if constexpr (tag_invocable<sender_transform_t, _Value, _Env>) {
-          return tag_invoke(*this, (_Value&&) __val, __env);
-        } else {
-          return (_Value&&) __val;
-        }
+      template <class _Value, class _Env = no_env>
+      constexpr _Value operator()(_Value&& __val, const _Env& __env = {}) const noexcept {
+        static_assert(sizeof(_Value), "Incomplete type used with sender_transform");
+        static_assert(sizeof(_Env), "Incomplete type used with sender_transform");
+        return (_Value&&) __val;
       }
     };
   } // namespace __sndr_tfx
@@ -760,14 +759,18 @@ namespace stdexec {
   // [execution.sndtraits]
   namespace __get_completion_signatures {
     template <class _Sender, class _Env>
+    using __tfx_sender = __call_result_t<sender_transform_t, _Sender, _Env>;
+
+    template <class _Sender, class _Env>
     concept __with_tag_invoke =
-      __valid<tag_invoke_result_t, get_completion_signatures_t, _Sender, _Env>;
+      __valid<tag_invoke_result_t, get_completion_signatures_t, __tfx_sender<_Sender, _Env>, _Env>;
 
-    template <class _Sender, class...>
-    using __member_alias_t = typename remove_cvref_t<_Sender>::completion_signatures;
+    template <class _Sender, class _Env>
+    using __member_alias_t =
+      typename std::remove_reference_t<__tfx_sender<_Sender, _Env>>::completion_signatures;
 
-    template <class _Sender>
-    concept __with_member_alias = __valid<__member_alias_t, _Sender>;
+    template <class _Sender, class _Env>
+    concept __with_member_alias = __valid<__member_alias_t, _Sender, _Env>;
 
     struct get_completion_signatures_t {
       template <class _Sender, class _Env>
@@ -776,7 +779,7 @@ namespace stdexec {
         static_assert(sizeof(_Env), "Incomplete type used with get_completion_signatures");
         if constexpr (__with_tag_invoke<_Sender, _Env>) {
           return __mbind_front_q<tag_invoke_result_t, get_completion_signatures_t>{};
-        } else if constexpr (__with_member_alias<_Sender>) {
+        } else if constexpr (__with_member_alias<_Sender, _Env>) {
           return __q<__member_alias_t>{};
         } else if constexpr (__awaitable<_Sender, __env_promise<_Env>>) {
           using _Result = __await_result_t<_Sender, __env_promise<_Env>>;
@@ -801,8 +804,8 @@ namespace stdexec {
 
       template <class _Sender, class _Env = no_env>
         requires(
-          __with_tag_invoke<_Sender, _Env> //
-          || __with_member_alias<_Sender>  //
+          __with_tag_invoke<_Sender, _Env>      //
+          || __with_member_alias<_Sender, _Env> //
           || __awaitable<_Sender, __env_promise<_Env>>
 #if STDEXEC_LEGACY_R5_CONCEPTS()
           || (same_as<_Env, no_env> && enable_sender<remove_cvref_t<_Sender>>)

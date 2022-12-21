@@ -304,7 +304,7 @@ namespace exec {
 
       __t() = default;
 
-      template <__none_of<__t&, const __t&> _T>
+      template <__none_of<__t, __t&, const __t&> _T>
         requires __callable<__create_vtable_t, __mtype<_Vtable>, __mtype<std::decay_t<_T>>>
       __t(_T&& __object)
         : __vtable_{__get_vtable<_T>()} {
@@ -845,7 +845,7 @@ namespace exec {
       using completion_signatures = typename __sender_base::completion_signatures;
 
       template <class _Sender>
-        requires(!stdexec::__decays_to<_Sender, any_sender> && stdexec::sender<_Sender>)
+        requires(!stdexec::__decays_to<_Sender, any_sender>) && stdexec::sender<_Sender>
       any_sender(_Sender&& __sender) noexcept(
         std::is_nothrow_constructible_v<__sender_base, _Sender>)
         : __sender_((_Sender&&) __sender) {
