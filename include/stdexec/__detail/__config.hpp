@@ -85,3 +85,8 @@
 #ifndef STDEXEC_ASSERT_FN
 #define STDEXEC_ASSERT_FN assert
 #endif
+
+#define STDEXEC_DETAIL_RETURN(X) \
+  noexcept(noexcept(X))->decltype(X) { \
+    return X; \
+  }
