@@ -28,26 +28,26 @@
 #endif
 
 namespace std {
-  //////////////////////////////////////////////////////////////////////////////
-  // <functional>
-  STDEXEC_STD_DEPRECATED
-  inline constexpr stdexec::tag_invoke_t tag_invoke{};
+  // //////////////////////////////////////////////////////////////////////////////
+  // // <functional>
+  // STDEXEC_STD_DEPRECATED
+  // inline constexpr stdexec::tag_invoke_t tag_invoke{};
 
-  template <class _Tag, class... _Ts>
-  using tag_invoke_result STDEXEC_STD_DEPRECATED = stdexec::tag_invoke_result<_Tag, _Ts...>;
+  // template <class _Tag, class... _Ts>
+  // using tag_invoke_result STDEXEC_STD_DEPRECATED = stdexec::tag_invoke_result<_Tag, _Ts...>;
 
-  template <class _Tag, class... _Ts>
-  using tag_invoke_result_t STDEXEC_STD_DEPRECATED = stdexec::tag_invoke_result_t<_Tag, _Ts...>;
+  // template <class _Tag, class... _Ts>
+  // using tag_invoke_result_t STDEXEC_STD_DEPRECATED = stdexec::tag_invoke_result_t<_Tag, _Ts...>;
 
-  template <class _Tag, class... _Ts>
-  concept tag_invocable /*STDEXEC_STD_DEPRECATED*/ = stdexec::tag_invocable<_Tag, _Ts...>;
+  // template <class _Tag, class... _Ts>
+  // concept tag_invocable /*STDEXEC_STD_DEPRECATED*/ = stdexec::tag_invocable<_Tag, _Ts...>;
 
-  template <class _Tag, class... _Ts>
-  concept nothrow_tag_invocable /*STDEXEC_STD_DEPRECATED*/ =
-    stdexec::nothrow_tag_invocable<_Tag, _Ts...>;
+  // template <class _Tag, class... _Ts>
+  // concept nothrow_tag_invocable /*STDEXEC_STD_DEPRECATED*/ =
+  //   stdexec::nothrow_tag_invocable<_Tag, _Ts...>;
 
-  template <auto& _Tag>
-  using tag_t STDEXEC_STD_DEPRECATED = stdexec::tag_t<_Tag>;
+  // template <auto& _Tag>
+  // using tag_t STDEXEC_STD_DEPRECATED = stdexec::tag_t<_Tag>;
 
   //////////////////////////////////////////////////////////////////////////////
   // <stop_token>
