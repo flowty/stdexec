@@ -26,6 +26,11 @@
 #include <utility>
 #include <vector>
 
+#ifdef _MSC_VER
+#include "intrin.h"
+#define  __builtin_ia32_pause() _mm_pause()
+#endif
+
 // The below code for spin_loop_pause is taken from https://github.com/max0x7ba/atomic_queue/blob/master/include/atomic_queue/defs.h
 // Copyright (c) 2019 Maxim Egorushkin. MIT License.
 
